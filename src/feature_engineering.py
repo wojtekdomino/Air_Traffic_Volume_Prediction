@@ -99,7 +99,7 @@ def create_lag_features(df: pd.DataFrame,
 
 
 def encode_categorical_features(df: pd.DataFrame, 
-                                cat_columns: List[str] = None) -> Tuple[pd.DataFrame, Dict]:
+                                cat_columns: List[str] = None) -> tuple[pd.DataFrame, Dict]:
     """
     Encode categorical features using label encoding.
     
@@ -129,7 +129,7 @@ def encode_categorical_features(df: pd.DataFrame,
 
 
 def engineer_features(df: pd.DataFrame, 
-                     create_lags: bool = True) -> Tuple[pd.DataFrame, Dict]:
+                     create_lags: bool = True) -> tuple[pd.DataFrame, Dict]:
     """
     Complete feature engineering pipeline.
     
