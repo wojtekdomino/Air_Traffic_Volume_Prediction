@@ -1,7 +1,25 @@
+# ================================================================================
+# WYMAGANIA PROJEKTU: Predykcja Natężenia Ruchu Lotniczego
+# ================================================================================
+#
+# Instalacja: pip install -r requirements.txt
+#
+# ================================================================================
+
+# Analiza danych i obliczenia numeryczne
 pandas>=1.5.0
 numpy>=1.23.0
+
+# Machine Learning - preprocessing i metryki
 scikit-learn>=1.2.0
+
+# Modele - Gradient Boosting
 lightgbm>=3.3.0
+
+# Deep Learning - PyTorch
 torch>=2.0.0
+
+# Wizualizacje (opcjonalne, ale przydatne do analizy)
 matplotlib>=3.6.0
 seaborn>=0.12.0
+

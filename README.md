@@ -1,102 +1,234 @@
-# ✈️ Air Traffic Volume Prediction
+# Predykcja Natężenia Ruchu Lotniczego
 
-Machine learning project for predicting air traffic volume at European airports using **LightGBM** and **PyTorch MLP** models, with **model compression** techniques (pruning & quantization).
+## Opis Projektu
 
-## Project Overview
+Projekt akademicki z zakresu uczenia maszynowego i uczenia głębokiego, którego celem jest **predykcja liczby operacji lotniczych IFR (Instrument Flight Rules)** na lotniskach europejskich na podstawie danych historycznych.
 
-This project predicts **IFR (Instrument Flight Rules) movements** at European airports using monthly aggregated flight data. It implements:
+### Cel Projektu
+Porównanie skuteczności różnych modeli uczenia maszynowego w zadaniu regresji:
+- **LightGBM** - model bazowy (gradient boosting)
+- **MLP (Multi-Layer Perceptron)** - sieć neuronowa w PyTorch
+- **Techniki kompresji modeli**: pruning i quantization
 
-- **Baseline Model**: LightGBM regressor
-- **Neural Network**: Multi-Layer Perceptron (MLP) in PyTorch
-- **Model Compression**: Structured pruning and INT8 quantization
-- **Comprehensive Evaluation**: Performance comparison across all models
+### Dataset
+**European Flights Dataset** - miesięczne dane agregowane o operacjach lotniczych na lotniskach europejskich.
 
-## Project Structure
+**Zmienna docelowa**: `FLT_TOT_1` (całkowita liczba operacji IFR)
+
+**Cechy wejściowe**:
+- `YEAR`, `MONTH_NUM` - informacje czasowe
+- `APT_ICAO` - kod ICAO lotniska
+- `STATE_NAME` - kraj
+- `FLT_DEP_1`, `FLT_ARR_1` - liczba odlotów i przylotów
+
+---
+
+## Struktura Projektu
 
 ```
 Air_Traffic_Volume_Prediction/
+├── main.py                           # GŁÓWNY PLIK - cały kod projektu
 ├── data/
-│   └── european_flights.csv          # Dataset (monthly IFR statistics)
-├── models/                            # Trained models and results
-│   ├── lightgbm_model.txt            # LightGBM model
-│   ├── mlp_fp32.pt                   # MLP FP32 model
-│   ├── mlp_pruned.pt                 # Pruned MLP model
-│   ├── mlp_int8.pt                   # Quantized MLP model
-│   └── mlp_scaler.pkl                # Feature scaler
-├── src/
-│   ├── preprocessing.py              # Data loading and cleaning
-│   ├── feature_engineering.py        # Feature creation
-│   ├── train_lightgbm.py            # LightGBM training
-│   ├── train_mlp.py                 # MLP training
-│   ├── pruning.py                   # Model pruning
-│   ├── quantization.py              # Model quantization
-│   └── evaluate.py                  # Model comparison
-├── notebooks/                         # Jupyter notebooks for exploration
-├── requirements.txt                   # Python dependencies
-└── README.md                         # This file
+│   └── european_flights.csv          # Dataset
+├── models/                            # Wytrenowane modele (generowane automatycznie)
+│   ├── lightgbm_model.txt
+│   ├── mlp_fp32.pt
+│   ├── mlp_pruned.pt
+│   ├── mlp_int8.pt
+│   ├── mlp_scaler.pkl
+│   └── model_comparison.csv          # Tabela porównawcza
+├── notebooks/
+│   └── exploration.ipynb             # Eksploracyjna analiza danych
+├── requirements.txt                   # Zależności
+└── README.md                         # Ten plik
 ```
 
-## **Quick Start**
+UWAGA: Cały kod projektu został skonsolidowany w jednym pliku `main.py` dla łatwiejszej nawigacji i zrozumienia struktury projektu.
 
-### 1. Install Dependencies
+---
+
+## Szybki Start
+
+### 1. Instalacja Zależności
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Prepare Data
+### 2. Przygotowanie Danych
 
-Place your `european_flights.csv` file in the `data/` directory.
+Upewnij się, że plik `european_flights.csv` znajduje się w folderze `data/`.
 
-### 3. Run the Complete Pipeline
+### 3. Uruchomienie Projektu
 
-Execute the scripts in order:
+**Cały projekt uruchamia się jednym poleceniem:**
 
 ```bash
-# Train LightGBM baseline
-cd src
-python train_lightgbm.py
-
-# Train MLP model
-python train_mlp.py
-
-# Apply pruning
-python pruning.py
-
-# Apply quantization
-python quantization.py
-
-# Compare all models
-python evaluate.py
+python main.py
 ```
 
-## Dataset
+### Czego Się Spodziewać?
 
-**Source**: European Flights Dataset  
-**Format**: Monthly aggregated IFR statistics per airport
+Po uruchomieniu, program automatycznie wykonuje:
 
-**Key Columns**:
-- `YEAR`, `MONTH_NUM` - Time features
-- `APT_ICAO` - Airport ICAO code
-- `STATE_NAME` - Country
-- `FLT_TOT_1` - **Target variable** (total IFR movements)
-- `FLT_DEP_1`, `FLT_ARR_1` - Departures and arrivals
+1. Wczytanie i czyszczenie danych
+2. Inżynierię cech (time features, seasonal features, lag features)
+3. Trenowanie modelu LightGBM
+4. Trenowanie sieci neuronowej MLP
+5. Kompresję modeli (pruning i quantization)
+6. Porównanie wszystkich modeli i zapisanie wyników
 
-## Features
+**Wyniki** zapisywane są w folderze `models/`:
+- Wytrenowane modele (`.pt`, `.txt`)
+- Tabela porównawcza (`model_comparison.csv`)
 
-The feature engineering pipeline creates:
+---
 
-### Time Features
-- `YEAR_TREND` - Normalized year index
-- `MONTH_SIN`, `MONTH_COS` - Cyclical month encoding
+## Metodologia
 
-### Seasonal Features
-- `SEASON` - Winter/Spring/Summer/Fall
-- `IS_SUMMER`, `IS_WINTER` - Binary seasonal flags
+### Przygotowanie Danych
 
-### Lag Features
-- `lag_1` - Previous month traffic
-- `lag_3` - 3-month rolling average
+1. **Czyszczenie**: usunięcie duplikatów i brakujących wartości
+2. **Selekcja cech**: wybór istotnych kolumn
+
+### Inżynieria Cech
+
+**Cechy czasowe:**
+- `YEAR_TREND` - znormalizowany trend roczny
+- `MONTH_SIN`, `MONTH_COS` - cykliczne kodowanie miesiąca
+
+**Cechy sezonowe:**
+- `SEASON` - pora roku (Winter/Spring/Summer/Fall)
+- `IS_SUMMER`, `IS_WINTER` - flagi binarne
+
+**Cechy opóźnione (lag features):**
+- `lag_1` - wartość z poprzedniego miesiąca
+- `lag_3` - średnia krocząca z 3 miesięcy
+
+**Kodowanie kategorii:**
+- Label Encoding dla: `APT_ICAO`, `STATE_NAME`, `SEASON`
+
+### Modele
+
+#### 1. LightGBM (Baseline)
+- Gradient Boosting Decision Trees
+- Szybki i efektywny dla tabulacyjnych danych
+- Early stopping dla uniknięcia przeuczenia
+
+#### 2. MLP (Multi-Layer Perceptron)
+- Architektura: Input → [128, 64, 32] → Output
+- Funkcja aktywacji: ReLU
+- Regularyzacja: Dropout (20%)
+- Optimizer: Adam
+- Loss: MSE (Mean Squared Error)
+
+#### 3. MLP z Pruningiem
+- Structured pruning (30% neuronów)
+- Redukcja rozmiaru modelu przy minimalnej utracie accuracy
+
+#### 4. MLP z Kwantyzacją
+- Dynamic quantization FP32 → INT8
+- ~4x redukcja rozmiaru modelu
+- Przyspieszenie inferencingu
+
+### Metryki Ewaluacji
+
+- **RMSE** (Root Mean Squared Error) - pierwiastek błędu średniokwadratowego
+- **MAE** (Mean Absolute Error) - średni błąd bezwzględny
+- **R²** (R-squared) - współczynnik determinacji
+- **Rozmiar modelu** (MB)
+
+---
+
+## Przykładowe Wyniki
+
+Po uruchomieniu projektu, w pliku `models/model_comparison.csv` znajdziesz tabelę porównawczą:
+
+| Model              | RMSE    | MAE     | R²      | Rozmiar (MB) |
+|--------------------|---------|---------|---------|--------------|
+| LightGBM           | ~XXX    | ~XXX    | ~0.XX   | ~X.XX        |
+| MLP FP32           | ~XXX    | ~XXX    | ~0.XX   | ~X.XX        |
+| MLP Pruned         | ~XXX    | ~XXX    | ~0.XX   | ~X.XX        |
+| MLP Quantized INT8 | ~XXX    | ~XXX    | ~0.XX   | ~X.XX        |
+
+---
+
+## Wymagania Techniczne
+
+**Python**: 3.8+
+
+**Biblioteki**:
+- `pandas` - analiza danych
+- `numpy` - operacje numeryczne
+- `scikit-learn` - preprocessing, metryki
+- `lightgbm` - model gradient boosting
+- `torch` - sieci neuronowe
+- `matplotlib`, `seaborn` - wizualizacje (opcjonalne)
+
+---
+
+## Struktura Kodu (main.py)
+
+Kod podzielony jest na **8 logicznych sekcji**:
+
+1. **Import bibliotek i konfiguracja** - stałe, ustawienia
+2. **Preprocessing** - wczytywanie i czyszczenie danych
+3. **Feature Engineering** - tworzenie cech
+4. **Trenowanie LightGBM** - model bazowy
+5. **Trenowanie MLP** - sieć neuronowa
+6. **Kompresja modeli** - pruning i quantization
+7. **Porównanie modeli** - ewaluacja i analiza
+8. **Funkcja główna** - pipeline projektu
+
+Każda funkcja ma **szczegółowe komentarze akademickie** wyjaśniające:
+- Co robi funkcja
+- Jakie parametry przyjmuje
+- Co zwraca
+- Dlaczego dana technika jest stosowana
+
+---
+
+## Wskazówki
+
+### Dostosowanie Hiperparametrów
+
+W pliku `main.py` w sekcji 1 znajdziesz stałe konfiguracyjne:
+
+```python
+RANDOM_STATE = 42          # Ziarno losowości
+TEST_SIZE = 0.2           # Proporcja zbioru testowego
+BATCH_SIZE = 256          # Batch size dla MLP
+LEARNING_RATE = 0.001     # Learning rate
+EPOCHS = 100              # Liczba epok
+PRUNING_AMOUNT = 0.3      # Procent neuronów do przycięcia
+```
+
+### Eksperymentowanie
+
+Możesz łatwo zmodyfikować:
+- Architekturę MLP (sekcja 5)
+- Hiperparametry LightGBM (sekcja 4)
+- Stopień kompresji (sekcja 6)
+
+---
+
+## Literatura i Referencje
+
+- **LightGBM**: [Ke et al., 2017 - LightGBM: A Highly Efficient Gradient Boosting Decision Tree]
+- **Pruning**: [Han et al., 2015 - Learning both Weights and Connections for Efficient Neural Networks]
+- **Quantization**: [Jacob et al., 2018 - Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference]
+
+---
+
+## Autor
+
+Projekt akademicki - Machine Learning & Deep Learning
+
+---
+
+## Licencja
+
+Projekt edukacyjny - użytek akademicki
 
 ### Categorical Encodings
 - Encoded `APT_ICAO` (airport)
