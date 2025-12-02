@@ -1,5 +1,15 @@
 # Predykcja Natężenia Ruchu Lotniczego
 
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?logo=pytorch&logoColor=white)
+![LightGBM](https://img.shields.io/badge/LightGBM-4.0%2B-9ACD32?logo=lightgbm&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.0%2B-F7931E?logo=scikit-learn&logoColor=white)
+![License](https://img.shields.io/badge/License-Academic-lightgrey)
+
+![Machine Learning](https://img.shields.io/badge/Machine%20Learning-Regression-blueviolet)
+![Deep Learning](https://img.shields.io/badge/Deep%20Learning-MLP-orange)
+![Model Compression](https://img.shields.io/badge/Model%20Compression-Pruning%20%26%20Quantization-green)
+
 [English version below](#english-version)
 
 ## Opis Projektu
@@ -243,6 +253,16 @@ Projekt edukacyjny - użytek akademicki
 ## English Version
 
 # Air Traffic Volume Prediction
+
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?logo=pytorch&logoColor=white)
+![LightGBM](https://img.shields.io/badge/LightGBM-4.0%2B-9ACD32?logo=lightgbm&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.0%2B-F7931E?logo=scikit-learn&logoColor=white)
+![License](https://img.shields.io/badge/License-Academic-lightgrey)
+
+![Machine Learning](https://img.shields.io/badge/Machine%20Learning-Regression-blueviolet)
+![Deep Learning](https://img.shields.io/badge/Deep%20Learning-MLP-orange)
+![Model Compression](https://img.shields.io/badge/Model%20Compression-Pruning%20%26%20Quantization-green)
 
 ## Project Description
 
