@@ -37,8 +37,6 @@ Air_Traffic_Volume_Prediction/
 │   ├── mlp_int8.pt
 │   ├── mlp_scaler.pkl
 │   └── model_comparison.csv          # Tabela porównawcza
-├── notebooks/
-│   └── exploration.ipynb             # Eksploracyjna analiza danych
 ├── requirements.txt                   # Zależności
 └── README.md                         # Ten plik
 ```
