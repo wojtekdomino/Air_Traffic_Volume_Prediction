@@ -1,5 +1,7 @@
 # Predykcja Natężenia Ruchu Lotniczego
 
+[English version below](#english-version)
+
 ## Opis Projektu
 
 Projekt akademicki z zakresu uczenia maszynowego i uczenia głębokiego, którego celem jest **predykcja liczby operacji lotniczych IFR (Instrument Flight Rules)** na lotniskach europejskich na podstawie danych historycznych.
@@ -138,16 +140,22 @@ Po uruchomieniu, program automatycznie wykonuje:
 
 ---
 
-## Przykładowe Wyniki
+## Wyniki
 
 Po uruchomieniu projektu, w pliku `models/model_comparison.csv` znajdziesz tabelę porównawczą:
 
 | Model              | RMSE    | MAE     | R²      | Rozmiar (MB) |
 |--------------------|---------|---------|---------|--------------|
-| LightGBM           | ~XXX    | ~XXX    | ~0.XX   | ~X.XX        |
-| MLP FP32           | ~XXX    | ~XXX    | ~0.XX   | ~X.XX        |
-| MLP Pruned         | ~XXX    | ~XXX    | ~0.XX   | ~X.XX        |
-| MLP Quantized INT8 | ~XXX    | ~XXX    | ~0.XX   | ~X.XX        |
+| LightGBM           | 1.03    | 0.25    | 0.9999  | 0.56         |
+| MLP FP32           | 13.21   | 10.89   | 0.9965  | 0.05         |
+| MLP Pruned         | 127.19  | 58.92   | 0.6717  | 0.05         |
+| MLP Quantized INT8 | 15.19   | 11.90   | 0.9953  | 0.02         |
+
+**Wnioski:**
+- **LightGBM** osiągnął najlepszą dokładność (R² = 0.9999)
+- **MLP Quantized INT8** oferuje najlepszy kompromis - dobra accuracy (R² = 0.9953) przy najmniejszym rozmiarze (0.02 MB)
+- **Pruning** znacząco obniża accuracy, ale utrzymuje mały rozmiar modelu
+- **Kwantyzacja** redukuje rozmiar o ~60% przy minimalnej utracie accuracy
 
 ---
 
@@ -222,153 +230,116 @@ Możesz łatwo zmodyfikować:
 
 Projekt akademicki - Machine Learning & Deep Learning
 
+**Autorzy:** Wojciech Domino & Mateusz Maj
+
 ---
 
 ## Licencja
 
 Projekt edukacyjny - użytek akademicki
 
-### Categorical Encodings
-- Encoded `APT_ICAO` (airport)
-- Encoded `STATE_NAME` (country)
-- Encoded `SEASON`
+---
 
-## Models
+## English Version
 
-### 1. LightGBM Regressor (Baseline)
-- **Type**: Gradient boosting trees
-- **Hyperparameters**: 
-  - Learning rate: 0.05
-  - Num leaves: 31
-  - Early stopping: 50 rounds
-- **Output**: Feature importance plot
+# Air Traffic Volume Prediction
 
-### 2. MLP (Multi-Layer Perceptron)
-- **Architecture**: Input → [128, 64, 32] → Output(1)
-- **Activation**: ReLU
-- **Optimizer**: Adam (lr=0.001)
-- **Loss**: MSE
-- **Epochs**: 50
-- **Dropout**: 0.2
+## Project Description
 
-### 3. Pruned MLP
-- **Method**: Structured L-n pruning
-- **Pruning amount**: 30% of neurons
-- **Fine-tuning**: 10 epochs at lr=0.0001
+Academic project in machine learning and deep learning focused on **predicting IFR (Instrument Flight Rules) operations** at European airports based on historical data.
 
-### 4. Quantized MLP
-- **Method**: Dynamic quantization
-- **Type**: INT8 (from FP32)
-- **Backend**: fbgemm (CPU)
-- **Target layers**: Linear layers
+### Project Goal
+Compare the effectiveness of different machine learning models in regression tasks:
+- **LightGBM** - baseline model (gradient boosting)
+- **MLP (Multi-Layer Perceptron)** - PyTorch neural network
+- **Model compression techniques**: pruning and quantization
 
-## Evaluation Metrics
+### Dataset
+**European Flights Dataset** - monthly aggregated data on flight operations at European airports.
 
-Each model is evaluated on:
+**Target variable**: `FLT_TOT_1` (total IFR operations)
 
-- **RMSE** (Root Mean Squared Error)
-- **MAE** (Mean Absolute Error)
-- **R²** (Coefficient of determination)
-- **Model Size** (MB)
-- **Inference Time** (ms/sample)
+**Input features**:
+- `YEAR`, `MONTH_NUM` - temporal information
+- `APT_ICAO` - ICAO airport code
+- `STATE_NAME` - country
+- `FLT_DEP_1`, `FLT_ARR_1` - number of departures and arrivals
 
-## Visualizations
+## Quick Start
 
-The evaluation script generates:
+### 1. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-1. **Comparison Table** - Summary of all metrics
-2. **Predictions vs Actual** - Scatter plots for each model
-3. **Residuals Distribution** - Histogram of prediction errors
-4. **Metrics Comparison** - Bar charts comparing RMSE, R², size, and speed
+### 2. Prepare Data
+Ensure `european_flights.csv` is in the `data/` folder.
 
-All plots are saved in the `models/` directory.
+### 3. Run the Project
+```bash
+python main.py
+```
 
-## Model Files
+The project automatically:
+1. Loads and cleans data
+2. Performs feature engineering
+3. Trains LightGBM model
+4. Trains MLP neural network
+5. Compresses models (pruning & quantization)
+6. Compares all models and saves results
 
-After training, the following files are saved:
+## Results
 
-- `lightgbm_model.txt` - LightGBM model (~1-5 MB)
-- `mlp_fp32.pt` - Full precision MLP (~0.5 MB)
-- `mlp_pruned.pt` - Pruned MLP (~0.5 MB, 30% sparse)
-- `mlp_int8.pt` - Quantized MLP (~0.1-0.2 MB, 4x smaller)
-- `mlp_scaler.pkl` - StandardScaler for MLP inputs
-- `evaluation_results.csv` - Detailed comparison table
+| Model              | RMSE    | MAE     | R²      | Size (MB) |
+|--------------------|---------|---------|---------|-----------|
+| LightGBM           | 1.03    | 0.25    | 0.9999  | 0.56      |
+| MLP FP32           | 13.21   | 10.89   | 0.9965  | 0.05      |
+| MLP Pruned         | 127.19  | 58.92   | 0.6717  | 0.05      |
+| MLP Quantized INT8 | 15.19   | 11.90   | 0.9953  | 0.02      |
 
-## Expected Results
+**Key findings:**
+- **LightGBM** achieved the best accuracy (R² = 0.9999)
+- **MLP Quantized INT8** offers the best trade-off - good accuracy (R² = 0.9953) with smallest size (0.02 MB)
+- **Pruning** significantly reduces accuracy but maintains small model size
+- **Quantization** reduces size by ~60% with minimal accuracy loss
 
-Typical performance (will vary based on your dataset):
+## Technical Requirements
 
-| Model | RMSE | R² | Size | Speed |
-|-------|------|-----|------|-------|
-| LightGBM | ~XXX | ~0.XX | ~X MB | ~0.00X ms |
-| MLP FP32 | ~XXX | ~0.XX | ~X MB | ~0.00X ms |
-| MLP Pruned | ~XXX | ~0.XX | ~X MB | ~0.00X ms |
-| MLP INT8 | ~XXX | ~0.XX | ~X MB | ~0.00X ms |
+**Python**: 3.8+
 
-**Compression Benefits**:
-- **Size reduction**: ~75% (FP32 → INT8)
-- **Speed improvement**: ~2-4x faster inference
-- **Accuracy retention**: Minimal loss (<2% RMSE increase)
+**Libraries**:
+- `pandas` - data analysis
+- `numpy` - numerical operations
+- `scikit-learn` - preprocessing, metrics
+- `lightgbm` - gradient boosting model
+- `torch` - neural networks
+- `matplotlib`, `seaborn` - visualizations (optional)
 
-## Methodology
+## Code Structure (main.py)
 
-### Data Preprocessing
-1. Load CSV data
-2. Remove duplicates
-3. Handle missing values
-4. Keep relevant columns
+The code is divided into **8 logical sections**:
 
-### Feature Engineering
-1. Create time-based features
-2. Add seasonal indicators
-3. Generate lag features per airport
-4. Encode categorical variables
+1. **Imports and configuration** - constants, settings
+2. **Preprocessing** - loading and cleaning data
+3. **Feature engineering** - creating features
+4. **LightGBM training** - baseline model
+5. **MLP training** - neural network
+6. **Model compression** - pruning and quantization
+7. **Model comparison** - evaluation and analysis
+8. **Main function** - project pipeline
 
-### Model Training
-1. **LightGBM**: Direct training with early stopping
-2. **MLP**: 
-   - Standardize features
-   - Train with MSE loss
-   - Save best model
+Each function has **detailed academic comments** explaining:
+- What the function does
+- What parameters it accepts
+- What it returns
+- Why the technique is used
 
-### Model Compression
-1. **Pruning**:
-   - Apply L-n structured pruning (30%)
-   - Fine-tune for 10 epochs
-   - Remove pruning masks
-2. **Quantization**:
-   - Dynamic quantization FP32 → INT8
-   - Evaluate accuracy retention
-   - Measure size/speed improvements
+## Authors
 
-## Notes
+**Wojciech Domino & Mateusz Maj**
 
-- **Data Quality**: Ensure your CSV has no major data quality issues
-- **Memory**: Large datasets may require chunking or sampling
-- **GPU**: MLP training can use CUDA if available
-- **Quantization**: INT8 models run best on CPU (fbgemm backend)
-
-## Contributing
-
-This project was created as a demonstration of:
-- Machine learning regression pipeline
-- Model compression techniques
-- PyTorch neural network implementation
-- LightGBM gradient boosting
-- Comprehensive model evaluation
+Academic project - Machine Learning & Deep Learning
 
 ## License
 
-This project is open source and available for educational purposes.
-
-## Acknowledgments
-
-- **Dataset**: European Aviation Safety Agency (EASA) / Eurocontrol
-- **Libraries**: PyTorch, LightGBM, scikit-learn, pandas
-- **Model Compression**: PyTorch quantization and pruning APIs
-
----
-
-**Author**: Wojciech Domino & Mateusz Maj 
-**Date**: November 2025  
-**Purpose**: Air traffic volume prediction with model compression
+Educational project - academic use
